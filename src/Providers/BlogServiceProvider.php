@@ -13,7 +13,11 @@ class BlogServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerMigrations();
 
+        $this->mapRoutes();
+
+        $this->publishConfig();
     }
 
     /**
@@ -23,7 +27,37 @@ class BlogServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/../../config/blog.php',
+            'carpentree.blog'
+        );
+    }
 
+    /**
+     * Define the "api" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function mapRoutes()
+    {
+        //$this->loadRoutesFrom(__DIR__.'/../../routes/api/admin.php');
+    }
+
+    public function publishConfig()
+    {
+        $this->publishes([
+            __DIR__.'/../../config/blog.php' => config_path('carpentree/blog.php'),
+        ], 'config');
+    }
+
+    /**
+     * Register Module's migration files.
+     */
+    protected function registerMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
     }
 
     /**
