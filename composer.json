@@ -1,5 +1,5 @@
 {
-    "name": "carpentree/blog",
+    "name": "codificio/carpentree-blog",
     "description": ":description",
     "license": "MIT",
     "authors": [
@@ -9,12 +9,13 @@
             "homepage": "https://codificio.com"
         }
     ],
-    "homepage": "https://github.com/carpentree/blog",
-    "keywords": ["Laravel", "Blog"],
+    "homepage": "https://github.com/codificio/carpentree-blog",
+    "keywords": ["Laravel", "Carpentree", "Blog"],
     "require": {
         "illuminate/support": "~5"
     },
     "require-dev": {
+        "codificio/carpentree-core": "latest",
         "phpunit/phpunit": "~7.0",
         "mockery/mockery": "^1.1",
         "orchestra/testbench": "~3.0",
