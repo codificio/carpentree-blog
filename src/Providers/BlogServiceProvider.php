@@ -18,6 +18,8 @@ class BlogServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->publishConfig();
+
+        $this->publishResources();
     }
 
     /**
@@ -31,6 +33,11 @@ class BlogServiceProvider extends ServiceProvider
             __DIR__.'/../../config/blog.php',
             'carpentree.blog'
         );
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../../config/permissions.php',
+            'carpentree.permissions'
+        );
     }
 
     /**
@@ -43,6 +50,13 @@ class BlogServiceProvider extends ServiceProvider
     protected function mapRoutes()
     {
         //$this->loadRoutesFrom(__DIR__.'/../../routes/api/admin.php');
+    }
+
+    public function publishResources()
+    {
+        $this->publishes([
+            __DIR__ . '/../../resources/assets' => resource_path('assets/vendor/carpentree/blog')
+        ], 'assets');
     }
 
     public function publishConfig()
