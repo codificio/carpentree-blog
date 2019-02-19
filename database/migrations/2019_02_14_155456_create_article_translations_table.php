@@ -17,7 +17,7 @@ class CreateArticleTranslationsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('article_id');
 
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->string('title');
             $table->text('body')->nullable();
             $table->text('excerpt')->nullable();
@@ -25,7 +25,6 @@ class CreateArticleTranslationsTable extends Migration
             $table->string('locale')->index();
 
             $table->unique(['article_id','locale']);
-            $table->unique(['slug', 'locale']);
 
             $table->foreign('article_id')
                 ->references('id')

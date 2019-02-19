@@ -55,7 +55,7 @@ class BlogServiceProvider extends ServiceProvider
     public function publishResources()
     {
         $this->publishes([
-            __DIR__ . '/../../resources/assets' => resource_path('assets/vendor/carpentree/blog')
+            __DIR__ . '/../../resources/assets' => resource_path('vendor/carpentree/blog')
         ], 'assets');
     }
 
