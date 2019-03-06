@@ -6,24 +6,35 @@ use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
 use Carpentree\Blog\Models\Article;
+use Carpentree\Blog\Services\Listing\Article\ArticleListingInterface;
 use Carpentree\Core\Http\Controllers\Controller;
+use Carpentree\Core\Http\Requests\Admin\ListRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
-class ArticlesController extends Controller
+class ArticleController extends Controller
 {
+
+    /** @var ArticleListingInterface */
+    protected $listingService;
+
+    public function __construct(ArticleListingInterface $listingService)
+    {
+        $this->listingService = $listingService;
+    }
 
     /**
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function list()
+    public function list(ListRequest $request)
     {
         if (!Auth::user()->can('articles.read')) {
             throw UnauthorizedException::forPermissions(['articles.read']);
         }
 
-        return ArticleResource::collection(Article::paginate(config('carpentree.pagination.per_page')));
+        $articles = $this->listingService->list($request);
+        return ArticleResource::collection($articles);
     }
 
     /**
@@ -36,9 +47,7 @@ class ArticlesController extends Controller
             throw UnauthorizedException::forPermissions(['articles.read']);
         }
 
-        $article = Article::findOrFail($id);
-
-        return ArticleResource::make($article);
+        return ArticleResource::make(Article::findOrFail($id));
     }
 
     /**
