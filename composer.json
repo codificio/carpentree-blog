@@ -1,6 +1,6 @@
 {
     "name": "codificio/carpentree-blog",
-    "description": ":description",
+    "description": "Blog package of Caprentree Framework",
     "license": "MIT",
     "authors": [
         {
