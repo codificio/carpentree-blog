@@ -18,6 +18,7 @@ class CreateArticleRequest extends FormRequest
             'attributes.title' => 'required|string',
             'attributes.body' => 'nullable|string',
             'attributes.excerpt' => 'nullable|string',
+            'attributes.status' => 'required|string',
 
             // Categories
             'relationships.categories.data' => 'array',
