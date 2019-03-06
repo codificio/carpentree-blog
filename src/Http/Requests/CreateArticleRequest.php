@@ -19,11 +19,14 @@ class CreateArticleRequest extends FormRequest
             'attributes.body' => 'nullable|string',
             'attributes.excerpt' => 'nullable|string',
 
-            // Categories: Multiple relation
-            'relationships.categories.*.id' => 'exists:categories,id',
+            // Categories
+            'relationships.categories.data' => 'array',
+            'relationships.categories.data.*.id' => 'exists:categories,id',
 
-            // Status: Single relation
-            'relationships.status.name' => 'string|filled',
+            // Meta fields
+            'relationships.meta.data' => 'array',
+            'relationships.meta.data.*.attributes.key' => 'string',
+            'relationships.meta.data.*.attributes.value' => 'required_with:relationships.meta.data.*.attributes.key|string'
             
         ];
     }

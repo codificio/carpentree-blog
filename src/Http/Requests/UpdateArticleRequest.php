@@ -15,16 +15,20 @@ class UpdateArticleRequest extends FormRequest
     {
         return [
             'id' => 'required|integer|exists:articles',
+
             'attributes.slug' => 'string|filled',
             'attributes.title' => 'string|filled',
             'attributes.body' => 'string|filled',
             'attributes.excerpt' => 'string|filled',
 
             // Categories: Multiple relation
-            'relationships.categories.*.id' => 'exists:categories,id',
+            'relationships.categories.data' => 'array',
+            'relationships.categories.data.*.id' => 'exists:categories,id',
 
-            // Status: Single relation
-            'relationships.status.name' => 'string|filled',
+            // Meta fields
+            'relationships.meta.data' => 'array',
+            'relationships.meta.data.*.attributes.key' => 'string',
+            'relationships.meta.data.*.attributes.value' => 'required_with:relationships.meta.data.*.attributes.key|string'
         ];
     }
 }

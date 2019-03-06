@@ -59,18 +59,23 @@ class ArticlesController extends Controller
             $article = Article::create($attributes);
 
             // Categories relationship
-            $categories = $request->input('relationships.categories', array());
+            // Syncronize only if input exists
+            if ($request->has('relationships.categories')) {
+                $_data = $request->input('relationships.categories.data');
 
-            $categoryIds = array();
-            foreach ($categories as $category) {
-                $categoryIds[] = $category['id'];
+                $categoryIds = array();
+                foreach ($_data as $category) {
+                    $categoryIds[] = $category['id'];
+                }
+
+                $article->syncCategories($categoryIds);
             }
 
-            $article->attachCategories($categoryIds);
-
-            // Status relation
-            $status = $request->input('relationships.status');
-            $article->setStatus($status['name']);
+            // Meta fields
+            if ($request->has('relationships.meta')) {
+                $_data = $request->input('relationships.meta.data', array());
+                $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
+            }
 
             return $article;
         });
@@ -101,19 +106,20 @@ class ArticlesController extends Controller
             // Categories relationship
             // Syncronize only if input exists
             if ($request->has('relationships.categories')) {
-                $categories = $request->input('relationships.categories');
+                $_data = $request->input('relationships.categories.data');
+
                 $categoryIds = array();
-                foreach ($categories as $category) {
+                foreach ($_data as $category) {
                     $categoryIds[] = $category['id'];
                 }
 
                 $article->syncCategories($categoryIds);
             }
 
-            // Status relationship
-            if ($request->has('relationships.status')) {
-                $status = $request->input('relationships.status');
-                $article->setStatus($status['name']);
+            // Meta fields
+            if ($request->has('relationships.meta')) {
+                $_data = $request->input('relationships.meta.data', array());
+                $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
             }
 
             return $article;
