@@ -2,6 +2,8 @@
 
 namespace Carpentree\Blog\Providers;
 
+use Carpentree\Blog\Services\Listing\Article\ArticleListing;
+use Carpentree\Blog\Services\Listing\Article\ArticleListingInterface;
 use Illuminate\Support\ServiceProvider;
 
 class BlogServiceProvider extends ServiceProvider
@@ -38,6 +40,14 @@ class BlogServiceProvider extends ServiceProvider
             __DIR__.'/../../config/permissions.php',
             'carpentree.permissions'
         );
+
+        $this->bindImplementation();
+    }
+
+    public function bindImplementation()
+    {
+        // User Listing Service
+        $this->app->bind(ArticleListingInterface::class, ArticleListing::class);
     }
 
     /**
