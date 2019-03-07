@@ -2,7 +2,7 @@
 
 namespace Carpentree\Blog\Models;
 
-use Carpentree\Core\Models\Category\Translation;
+use Carpentree\Blog\Models\Article\Translation;
 use Carpentree\Core\Traits\Categorizable;
 use Carpentree\Core\Traits\HasMeta;
 use Dimsav\Translatable\Translatable;
