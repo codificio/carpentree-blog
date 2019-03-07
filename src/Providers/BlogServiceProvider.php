@@ -59,7 +59,7 @@ class BlogServiceProvider extends ServiceProvider
      */
     protected function mapRoutes()
     {
-        //$this->loadRoutesFrom(__DIR__.'/../../routes/api/admin.php');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/api/admin.php');
     }
 
     public function publishResources()
