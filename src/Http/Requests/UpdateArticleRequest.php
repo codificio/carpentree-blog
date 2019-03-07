@@ -29,7 +29,13 @@ class UpdateArticleRequest extends FormRequest
             // Meta fields
             'relationships.meta.data' => 'array',
             'relationships.meta.data.*.attributes.key' => 'string',
-            'relationships.meta.data.*.attributes.value' => 'required_with:relationships.meta.data.*.attributes.key|string'
+            'relationships.meta.data.*.attributes.value' => 'required_with:relationships.meta.data.*.attributes.key|string',
+
+            // Media
+            'relationships.media.data' => 'array',
+            'relationships.media.data.*.id' => 'integer',
+            'relationships.media.data.*.meta.tag' => 'string',
+            'relationships.media.data.*.meta.order' => 'integer'
         ];
     }
 }

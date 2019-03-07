@@ -8,14 +8,13 @@ use Carpentree\Core\Traits\HasMeta;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carpentree\Core\Scout\Searchable;
+use Plank\Mediable\Mediable;
 
-class Article extends Model implements HasMedia
+class Article extends Model
 {
-    use Translatable, Categorizable, HasMediaTrait, HasMeta, SoftDeletes, Searchable;
+    use Translatable, Categorizable, HasMeta, SoftDeletes, Searchable, Mediable;
 
     public $translationModel = Translation::class;
 

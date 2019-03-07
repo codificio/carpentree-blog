@@ -25,6 +25,7 @@ class ArticleController extends Controller
     }
 
     /**
+     * @param ListRequest $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function list(ListRequest $request)
@@ -86,6 +87,45 @@ class ArticleController extends Controller
                 $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
             }
 
+            // Media
+            if ($request->has('relationships.media')) {
+                $_data = collect($request->input('relationships.meta.data', array()));
+
+                if ($_data->count() > 0) {
+                    $dataByTag = $_data->groupBy(function ($item, $key) {
+                        if (array_key_exists('meta', $item)) {
+                            $meta = $item['meta'];
+                            $tag = array_key_exists('tag', $meta) ? $meta['tag'] : 'default';
+                        } else {
+                            $tag = 'default';
+                        }
+
+                        return $tag;
+                    });
+
+                    /*
+                     * $dataBytag = [
+                     *    'tag-key' => [
+                     *       ['id' => 1, 'meta' => ...],
+                     *       ['id' => 2, 'meta' => ...]
+                     *    ],
+                     * ]
+                     */
+
+                    foreach ($dataByTag as $tag => $files) {
+                        $ids = collect($files)->pluck('id');
+                        $article->syncMedia($ids, $tag);
+                    }
+                } else {
+                    $dataByTag = $article->getAllMediaByTag();
+                    foreach ($dataByTag as $tag => $files) {
+                        $article->detachMediaTags($tag);
+                    }
+                }
+            }
+
+            $article->save();
+
             return $article;
         });
 
@@ -130,6 +170,45 @@ class ArticleController extends Controller
                 $_data = $request->input('relationships.meta.data', array());
                 $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
             }
+
+            // Media
+            if ($request->has('relationships.media')) {
+                $_data = collect($request->input('relationships.meta.data', array()));
+
+                if ($_data->count() > 0) {
+                    $dataByTag = $_data->groupBy(function ($item, $key) {
+                        if (array_key_exists('meta', $item)) {
+                            $meta = $item['meta'];
+                            $tag = array_key_exists('tag', $meta) ? $meta['tag'] : 'default';
+                        } else {
+                            $tag = 'default';
+                        }
+
+                        return $tag;
+                    });
+
+                    /*
+                     * $dataBytag = [
+                     *    'tag-key' => [
+                     *       ['id' => 1, 'meta' => ...],
+                     *       ['id' => 2, 'meta' => ...]
+                     *    ],
+                     * ]
+                     */
+
+                    foreach ($dataByTag as $tag => $files) {
+                        $ids = collect($files)->pluck('id');
+                        $article->syncMedia($ids, $tag);
+                    }
+                } else {
+                    $dataByTag = $article->getAllMediaByTag();
+                    foreach ($dataByTag as $tag => $files) {
+                        $article->detachMediaTags($tag);
+                    }
+                }
+            }
+
+            $article->save();
 
             return $article;
         });
