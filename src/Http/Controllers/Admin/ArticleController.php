@@ -2,6 +2,7 @@
 
 namespace Carpentree\Blog\Http\Controllers\Admin;
 
+use Carpentree\Blog\Http\Builders\Article\ArticleBuilderInterface;
 use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
@@ -19,9 +20,13 @@ class ArticleController extends Controller
     /** @var ArticleListingInterface */
     protected $listingService;
 
-    public function __construct(ArticleListingInterface $listingService)
+    /** @var ArticleBuilderInterface */
+    protected $builder;
+
+    public function __construct(ArticleListingInterface $listingService, ArticleBuilderInterface $builder)
     {
         $this->listingService = $listingService;
+        $this->builder = $builder;
     }
 
     /**
@@ -61,75 +66,24 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.create']);
         }
 
-        $article = DB::transaction(function () use ($request) {
+        $builder = $this->builder->init()->create($request->input('attributes'));
 
-            // Article attributes
-            $attributes = $request->input('attributes');
-            /** @var Article $article */
-            $article = Article::create($attributes);
+        if ($request->has('relationships.categories')) {
+            $builder->withCategories($request->input('relationships.categories.data'));
+        }
 
-            // Categories relationship
-            // Syncronize only if input exists
-            if ($request->has('relationships.categories')) {
-                $_data = $request->input('relationships.categories.data');
+        if ($request->has('relationships.meta')) {
+            $builder->withMeta($request->input('relationships.meta.data', array()));
+        }
 
-                $categoryIds = array();
-                foreach ($_data as $category) {
-                    $categoryIds[] = $category['id'];
-                }
+        if ($request->has('relationships.media')) {
+            $builder->withMedia($request->input('relationships.media.data', array()));
+        }
 
-                $article->syncCategories($categoryIds);
-            }
+        $article = $builder->build();
 
-            // Meta fields
-            if ($request->has('relationships.meta')) {
-                $_data = $request->input('relationships.meta.data', array());
-                $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
-            }
-
-            // Media
-            if ($request->has('relationships.media')) {
-                $_data = collect($request->input('relationships.meta.data', array()));
-
-                if ($_data->count() > 0) {
-                    $dataByTag = $_data->groupBy(function ($item, $key) {
-                        if (array_key_exists('meta', $item)) {
-                            $meta = $item['meta'];
-                            $tag = array_key_exists('tag', $meta) ? $meta['tag'] : 'default';
-                        } else {
-                            $tag = 'default';
-                        }
-
-                        return $tag;
-                    });
-
-                    /*
-                     * $dataBytag = [
-                     *    'tag-key' => [
-                     *       ['id' => 1, 'meta' => ...],
-                     *       ['id' => 2, 'meta' => ...]
-                     *    ],
-                     * ]
-                     */
-
-                    foreach ($dataByTag as $tag => $files) {
-                        $ids = collect($files)->pluck('id');
-                        $article->syncMedia($ids, $tag);
-                    }
-                } else {
-                    $dataByTag = $article->getAllMediaByTag();
-                    foreach ($dataByTag as $tag => $files) {
-                        $article->detachMediaTags($tag);
-                    }
-                }
-            }
-
-            $article->save();
-
-            return $article;
-        });
-
-        return ArticleResource::make($article)->response()->setStatusCode(201);
+        return ArticleResource::make($article->load(['meta', 'categories']))
+            ->response()->setStatusCode(201);
     }
 
     /**
@@ -142,78 +96,30 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.update']);
         }
 
-        $article = DB::transaction(function () use ($request) {
-            /** @var Article $article */
-            $article = Article::findOrFail($request->input('id'));
+        /** @var Article $article */
+        $article = Article::findOrFail($request->input('id'));
 
-            // Article attributes
-            if ($request->has('attributes')) {
-                $attributes = $request->input('attributes');
-                $article->update($attributes);
-            }
+        $builder = $this->builder->init($article);
 
-            // Categories relationship
-            // Syncronize only if input exists
-            if ($request->has('relationships.categories')) {
-                $_data = $request->input('relationships.categories.data');
+        if ($request->has('attributes')) {
+            $builder->create($request->input('attributes'));
+        }
 
-                $categoryIds = array();
-                foreach ($_data as $category) {
-                    $categoryIds[] = $category['id'];
-                }
+        if ($request->has('relationships.categories')) {
+            $builder->withCategories($request->input('relationships.categories.data'));
+        }
 
-                $article->syncCategories($categoryIds);
-            }
+        if ($request->has('relationships.meta')) {
+            $builder->withMeta($request->input('relationships.meta.data', array()));
+        }
 
-            // Meta fields
-            if ($request->has('relationships.meta')) {
-                $_data = $request->input('relationships.meta.data', array());
-                $article = $article->syncMeta(collect($_data)->pluck('attributes')->toArray());
-            }
+        if ($request->has('relationships.media')) {
+            $builder->withMedia($request->input('relationships.media.data', array()));
+        }
 
-            // Media
-            if ($request->has('relationships.media')) {
-                $_data = collect($request->input('relationships.meta.data', array()));
+        $article = $builder->build();
 
-                if ($_data->count() > 0) {
-                    $dataByTag = $_data->groupBy(function ($item, $key) {
-                        if (array_key_exists('meta', $item)) {
-                            $meta = $item['meta'];
-                            $tag = array_key_exists('tag', $meta) ? $meta['tag'] : 'default';
-                        } else {
-                            $tag = 'default';
-                        }
-
-                        return $tag;
-                    });
-
-                    /*
-                     * $dataBytag = [
-                     *    'tag-key' => [
-                     *       ['id' => 1, 'meta' => ...],
-                     *       ['id' => 2, 'meta' => ...]
-                     *    ],
-                     * ]
-                     */
-
-                    foreach ($dataByTag as $tag => $files) {
-                        $ids = collect($files)->pluck('id');
-                        $article->syncMedia($ids, $tag);
-                    }
-                } else {
-                    $dataByTag = $article->getAllMediaByTag();
-                    foreach ($dataByTag as $tag => $files) {
-                        $article->detachMediaTags($tag);
-                    }
-                }
-            }
-
-            $article->save();
-
-            return $article;
-        });
-
-        return ArticleResource::make($article);
+        return ArticleResource::make($article->load(['meta', 'categories']));
     }
 
     /**
