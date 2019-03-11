@@ -1,9 +1,9 @@
 <?php
 
-namespace Carpentree\Blog\Http\Builders\Article;
+namespace Carpentree\Blog\Builders\Article;
 
 use Carpentree\Blog\Models\Article;
-use Carpentree\Core\Http\Builders\BaseBuilder;
+use Carpentree\Core\Builders\BaseBuilder;
 
 class ArticleBuilder extends BaseBuilder implements ArticleBuilderInterface
 {

@@ -2,7 +2,7 @@
 
 namespace Carpentree\Blog\Http\Controllers\Admin;
 
-use Carpentree\Blog\Http\Builders\Article\ArticleBuilderInterface;
+use Carpentree\Blog\Builders\Article\ArticleBuilderInterface;
 use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
@@ -11,7 +11,6 @@ use Carpentree\Blog\Services\Listing\Article\ArticleListingInterface;
 use Carpentree\Core\Http\Controllers\Controller;
 use Carpentree\Core\Http\Requests\Admin\ListRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class ArticleController extends Controller
@@ -69,15 +68,20 @@ class ArticleController extends Controller
         $builder = $this->builder->init()->create($request->input('attributes'));
 
         if ($request->has('relationships.categories')) {
-            $builder->withCategories($request->input('relationships.categories.data'));
+            $_data = $request->input('relationships.categories.data');
+            $_ids = collect($_data)->pluck('id');
+            $builder->withCategories($_ids->toArray());
         }
 
         if ($request->has('relationships.meta')) {
-            $builder->withMeta($request->input('relationships.meta.data', array()));
+            $_data = $request->input('relationships.meta.data', array());
+            $_attributes = collect($_data)->pluck('attributes')->toArray();
+            $builder->withMeta($_attributes);
         }
 
         if ($request->has('relationships.media')) {
-            $builder->withMedia($request->input('relationships.media.data', array()));
+            $_data = $this->collectMediaByTagFromRequest($request->input('relationships.media.data', array()));
+            $builder->withMedia($_data);
         }
 
         $article = $builder->build();
@@ -106,15 +110,20 @@ class ArticleController extends Controller
         }
 
         if ($request->has('relationships.categories')) {
-            $builder->withCategories($request->input('relationships.categories.data'));
+            $_data = $request->input('relationships.categories.data');
+            $_ids = collect($_data)->pluck('id');
+            $builder->withCategories($_ids->toArray());
         }
 
         if ($request->has('relationships.meta')) {
-            $builder->withMeta($request->input('relationships.meta.data', array()));
+            $_data = $request->input('relationships.meta.data', array());
+            $_attributes = collect($_data)->pluck('attributes')->toArray();
+            $builder->withMeta($_attributes);
         }
 
         if ($request->has('relationships.media')) {
-            $builder->withMedia($request->input('relationships.media.data', array()));
+            $_data = $this->collectMediaByTagFromRequest($request->input('relationships.media.data', array()));
+            $builder->withMedia($_data);
         }
 
         $article = $builder->build();
@@ -141,6 +150,28 @@ class ArticleController extends Controller
         } else {
             return response()->json(null, 202);
         }
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function collectMediaByTagFromRequest(array $data)
+    {
+        $collection = [];
+
+        foreach ($data as $item) {
+            if (array_key_exists('meta', $item)) {
+                $meta = $item['meta'];
+                $tag = array_key_exists('tag', $meta) ? $meta['tag'] : 'default';
+            } else {
+                $tag = 'default';
+            }
+
+            $collection[$tag][] = $item['id'];
+        }
+
+        return $collection;
     }
 
 }
