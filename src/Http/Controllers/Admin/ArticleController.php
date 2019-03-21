@@ -7,7 +7,7 @@ use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
 use Carpentree\Blog\Models\Article;
-use Carpentree\Blog\Services\Listing\Article\ArticleListingInterface;
+use Carpentree\Blog\Listing\Article\ArticleListingInterface;
 use Carpentree\Core\Http\Controllers\Controller;
 use Carpentree\Core\Http\Requests\Admin\ListRequest;
 use Illuminate\Support\Facades\Auth;

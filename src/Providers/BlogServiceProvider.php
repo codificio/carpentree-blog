@@ -4,8 +4,8 @@ namespace Carpentree\Blog\Providers;
 
 use Carpentree\Blog\Builders\Article\ArticleBuilder;
 use Carpentree\Blog\Builders\Article\ArticleBuilderInterface;
-use Carpentree\Blog\Services\Listing\Article\ArticleListing;
-use Carpentree\Blog\Services\Listing\Article\ArticleListingInterface;
+use Carpentree\Blog\Listing\Article\ArticleListing;
+use Carpentree\Blog\Listing\Article\ArticleListingInterface;
 use Illuminate\Support\ServiceProvider;
 
 class BlogServiceProvider extends ServiceProvider

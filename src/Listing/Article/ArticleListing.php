@@ -1,11 +1,11 @@
 <?php
 
-namespace Carpentree\Blog\Services\Listing\Article;
+namespace Carpentree\Blog\Listing\Article;
 
 use Carpentree\Blog\Models\Article;
-use Carpentree\Core\Services\Listing\BaseListing;
+use Carpentree\Core\Listing\AlgoliaBaseListing;
 
-class ArticleListing extends BaseListing implements ArticleListingInterface
+class ArticleListing extends AlgoliaBaseListing implements ArticleListingInterface
 {
     public function __construct()
     {
