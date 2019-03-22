@@ -3,6 +3,7 @@
 namespace Carpentree\Blog\Http\Controllers\Admin;
 
 use Carpentree\Blog\Builders\Article\ArticleBuilderInterface;
+use Carpentree\Blog\DataAccess\Article\ArticleDataAccess;
 use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
@@ -22,10 +23,18 @@ class ArticleController extends Controller
     /** @var ArticleBuilderInterface */
     protected $builder;
 
-    public function __construct(ArticleListingInterface $listingService, ArticleBuilderInterface $builder)
+    /** @var ArticleDataAccess */
+    protected $dataAccess;
+
+    public function __construct(
+        ArticleListingInterface $listingService,
+        ArticleBuilderInterface $builder,
+        ArticleDataAccess $dataAccess
+    )
     {
         $this->listingService = $listingService;
         $this->builder = $builder;
+        $this->dataAccess = $dataAccess;
     }
 
     /**
@@ -52,7 +61,7 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.read']);
         }
 
-        return ArticleResource::make(Article::findOrFail($id));
+        return ArticleResource::make($this->dataAccess->findOrFail($id));
     }
 
     /**
@@ -65,7 +74,7 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.create']);
         }
 
-        $builder = $this->builder->init()->create($request->input('attributes'));
+        $builder = $this->builder->init()->fill($request->input('attributes'));
 
         if ($request->has('relationships.categories')) {
             $_data = $request->input('relationships.categories.data');
@@ -101,12 +110,12 @@ class ArticleController extends Controller
         }
 
         /** @var Article $article */
-        $article = Article::findOrFail($request->input('id'));
+        $article = $this->dataAccess->findOrFail($request->input('id'));
 
         $builder = $this->builder->init($article);
 
         if ($request->has('attributes')) {
-            $builder->create($request->input('attributes'));
+            $builder->fill($request->input('attributes'));
         }
 
         if ($request->has('relationships.categories')) {
@@ -143,9 +152,9 @@ class ArticleController extends Controller
         }
 
         /** @var Article $article */
-        $article = Article::findOrFail($id);
+        $article = $this->dataAccess->findOrFail($id);
 
-        if ($article->delete()) {
+        if ($this->dataAccess->delete($article)) {
             return response()->json(null, 204);
         } else {
             return response()->json(null, 202);

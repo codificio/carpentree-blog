@@ -4,8 +4,11 @@ namespace Carpentree\Blog\Providers;
 
 use Carpentree\Blog\Builders\Article\ArticleBuilder;
 use Carpentree\Blog\Builders\Article\ArticleBuilderInterface;
+use Carpentree\Blog\DataAccess\Article\ArticleDataAccess;
+use Carpentree\Blog\DataAccess\Article\EloquentArticleDataAccess;
 use Carpentree\Blog\Listing\Article\ArticleListing;
 use Carpentree\Blog\Listing\Article\ArticleListingInterface;
+use Carpentree\Blog\Models\Article;
 use Illuminate\Support\ServiceProvider;
 
 class BlogServiceProvider extends ServiceProvider
@@ -53,6 +56,11 @@ class BlogServiceProvider extends ServiceProvider
 
         // Article Builder Service
         $this->app->bind(ArticleBuilderInterface::class, ArticleBuilder::class);
+
+        // Article Data Access
+        $this->app->bind(ArticleDataAccess::class, function () {
+            return new EloquentArticleDataAccess(Article::class);
+        });
     }
 
     /**
