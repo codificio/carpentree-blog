@@ -8,7 +8,6 @@ use Carpentree\Blog\Http\Requests\CreateArticleRequest;
 use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
 use Carpentree\Blog\Models\Article;
-use Carpentree\Blog\Listing\Article\ArticleListingInterface;
 use Carpentree\Core\Http\Controllers\Controller;
 use Carpentree\Core\Http\Requests\Admin\ListRequest;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +16,6 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 class ArticleController extends Controller
 {
 
-    /** @var ArticleListingInterface */
-    protected $listingService;
-
     /** @var ArticleBuilderInterface */
     protected $builder;
 
@@ -27,12 +23,10 @@ class ArticleController extends Controller
     protected $dataAccess;
 
     public function __construct(
-        ArticleListingInterface $listingService,
         ArticleBuilderInterface $builder,
         ArticleDataAccess $dataAccess
     )
     {
-        $this->listingService = $listingService;
         $this->builder = $builder;
         $this->dataAccess = $dataAccess;
     }
@@ -47,7 +41,7 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.read']);
         }
 
-        $articles = $this->listingService->list($request);
+        $articles = $this->dataAccess->fullTextSearch($request->input('filter.query'));
         return ArticleResource::collection($articles);
     }
 
