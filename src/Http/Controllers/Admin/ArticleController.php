@@ -9,7 +9,7 @@ use Carpentree\Blog\Http\Requests\UpdateArticleRequest;
 use Carpentree\Blog\Http\Resources\ArticleResource;
 use Carpentree\Blog\Models\Article;
 use Carpentree\Core\Http\Controllers\Controller;
-use Carpentree\Core\Http\Requests\Admin\ListRequest;
+use Carpentree\Core\Http\Requests\Admin\SearchRequest;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
@@ -32,10 +32,23 @@ class ArticleController extends Controller
     }
 
     /**
-     * @param ListRequest $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function list(ListRequest $request)
+    public function list()
+    {
+        if (!Auth::user()->can('articles.read')) {
+            throw UnauthorizedException::forPermissions(['articles.read']);
+        }
+
+        $articles = $this->dataAccess->list();
+        return ArticleResource::collection($articles);
+    }
+
+    /**
+     * @param SearchRequest $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function search(SearchRequest $request)
     {
         if (!Auth::user()->can('articles.read')) {
             throw UnauthorizedException::forPermissions(['articles.read']);

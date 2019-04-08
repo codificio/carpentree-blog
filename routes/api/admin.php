@@ -17,6 +17,9 @@ Route::prefix('api/admin')
                 Route::get('/', 'Admin\ArticleController@list')
                     ->name('articles.list');
 
+                Route::get('search', 'Admin\ArticleController@search')
+                    ->name('articles.search');
+
                 Route::get('{id}', 'Admin\ArticleController@get')
                     ->name('articles.get');
 
