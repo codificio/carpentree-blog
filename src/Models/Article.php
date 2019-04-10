@@ -37,6 +37,7 @@ class Article extends Model
     public function toSearchableArray()
     {
         $array = [
+            'id' => $this->id, // TNTSearch needs id
             'title' => $this->title,
             'body' => Str::limit(strip_tags($this->body), 200),
             'excerpt' => Str::limit(strip_tags($this->excerpt), 200),
