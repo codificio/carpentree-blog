@@ -2,6 +2,7 @@
 
 namespace Carpentree\Blog\Http\Resources;
 
+use Carpentree\Core\Http\Resources\MediaResource;
 use Carpentree\Core\Http\Resources\Relationships\CategoryResourceRelationship;
 use Carpentree\Core\Http\Resources\Relationships\MetaResourceRelationship;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -37,15 +38,17 @@ class ArticleResource extends JsonResource
 
             'relationships' => [
 
-                // Categories
-                'categories' => $this->whenLoaded('categories', array(
-                    'data' => CategoryResourceRelationship::collection($this->categories)
-                ), array()),
+                'categories' => [
+                    'data' => $this->whenLoaded('categories', CategoryResourceRelationship::collection($this->categories), array())
+                ],
 
-                // Meta
-                'meta' => $this->whenLoaded('meta', array(
-                    'data' => MetaResourceRelationship::collection($this->meta)
-                ), array())
+                'meta' => [
+                    'data' => $this->whenLoaded('meta', MetaResourceRelationship::collection($this->meta), array())
+                ],
+
+                'media' => [
+                    'data' => $this->whenLoaded('media', MediaResource::collection($this->media), array())
+                ]
 
             ],
 

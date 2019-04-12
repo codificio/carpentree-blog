@@ -68,12 +68,16 @@ class ArticleController extends Controller
             throw UnauthorizedException::forPermissions(['articles.read']);
         }
 
-        return ArticleResource::make($this->dataAccess->findOrFail($id));
+        /** @var Article $article */
+        $article = $this->dataAccess->findOrFail($id);
+
+        return ArticleResource::make($article->load('media', 'categories'));
     }
 
     /**
      * @param CreateArticleRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function create(CreateArticleRequest $request)
     {
