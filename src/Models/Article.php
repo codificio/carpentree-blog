@@ -48,4 +48,13 @@ class Article extends Model
         return $array;
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return mixed
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
 }
