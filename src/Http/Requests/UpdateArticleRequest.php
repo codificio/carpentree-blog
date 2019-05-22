@@ -19,7 +19,7 @@ class UpdateArticleRequest extends FormRequest
             'attributes.slug' => 'string|filled',
             'attributes.title' => 'string|filled',
             'attributes.body' => 'string|filled',
-            'attributes.excerpt' => 'string|filled',
+            'attributes.excerpt' => 'string',
             'attributes.status' => 'required|string',
 
             // Categories: Multiple relation
