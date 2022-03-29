@@ -6,13 +6,14 @@ use Carpentree\Blog\Models\Article\Translation;
 use Carpentree\Core\Scout\Searchable;
 use Carpentree\Core\Traits\Categorizable;
 use Carpentree\Core\Traits\HasMeta;
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Plank\Mediable\Mediable;
 
-class Article extends Model
+class Article extends Model implements TranslatableContract
 {
     use Translatable, Categorizable, HasMeta, SoftDeletes, Searchable, Mediable;
 

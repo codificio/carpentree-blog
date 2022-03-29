@@ -12,7 +12,7 @@
     "homepage": "https://github.com/codificio/carpentree-blog",
     "keywords": ["Laravel", "Carpentree", "Blog"],
     "require": {
-        "illuminate/support": "~5"
+        "illuminate/support": "^5.0 || ^6.0"
     },
     "require-dev": {
         "codificio/carpentree-core": "~0.3",
